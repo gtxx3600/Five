@@ -10,7 +10,7 @@ public class Five_Board extends JPanel implements MouseListener {
 	 */
 	int row;
 
-	int DefaultWidth = 600;
+	int DefaultWidth = 1200;
 	int rowPixels = 20;
 	Five_Game fg;
 	int xOffset = 10;
@@ -85,13 +85,32 @@ public class Five_Board extends JPanel implements MouseListener {
 			}
 		}
 	}
-
+	private void paintScore(Graphics2D g2d) {
+		int[][][] score = fg.getScore();
+		g2d.setPaint(Color.black);
+		for (int i = 0; i < (fg.DefaultRow + 1); i++) {
+			for (int j = 0; j < (fg.DefaultRow + 1); j++) {
+				if (score[0][i][j] != 0) {
+					g2d.drawString(""+score[0][i][j], xOffset + i * rowPixels, yOffset	+ j * rowPixels);
+				}
+			}
+		}
+		g2d.setPaint(Color.white);
+		for (int i = 0; i < (fg.DefaultRow + 1); i++) {
+			for (int j = 0; j < (fg.DefaultRow + 1); j++) {
+				if (score[1][i][j] != 0) {
+					g2d.drawString(""+score[1][i][j], xOffset + i * rowPixels, yOffset	+ j * rowPixels - 15);
+				}
+			}
+		}
+	}
 	public void paint(Graphics g) {
 		super.paint(g);
 		// setSize(DefaultWidth,DefaultWidth);
 		Graphics2D g2d = (Graphics2D) g;
 		paintBoard(g2d);
 		paintChess(g2d);
+		paintScore(g2d);
 	}
 
 	@Override

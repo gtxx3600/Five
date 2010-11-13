@@ -16,8 +16,7 @@ public class FiveChess {
 //			System.out.println("outer");
 //		}
 		Five_Game fg = new Five_Game();
-		int a = 1<<3;
-		System.out.println(""+a);
+		
 		
 	}
 

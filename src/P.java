@@ -12,15 +12,17 @@ public class P {// Represent Point or Tuple
 		color = 0;
 		direct = -1;
 	}
-//	public P(int a,int b,int d)
-//	{
-//		x=a;y=b;direct=d;
-//		l=r=color=0;
-//	}
+	public P(int a,int b,int c)
+	{
+		x=a;y=b;direct=-1;
+		l=r=0;
+		color = c;
+	}
 	public P(int a,int b,int c,int d)
 	{
 		x=a;y=b;direct=d;
-		l=r=color=0;
+		l=r=0;
+		color = c;
 	}
 	public P setColor(int c)
 	{
@@ -50,7 +52,7 @@ public class P {// Represent Point or Tuple
 		case Five_Game.NORTH:
 			return new P(x,y-num,color,direct);
 		case Five_Game.NORTH_EAST:
-			return new P(x+num,y,color,direct);
+			return new P(x+num,y-num,color,direct);
 		default:
 			System.err.println("ERROR in P.inc():direct out of range");
 			return new P(-1,-1,0,0);

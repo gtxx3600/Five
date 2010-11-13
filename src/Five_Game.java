@@ -3,13 +3,14 @@ public class Five_Game {
 	int players[];
 	int count;
 	public int status[][];
+	public int scores[][][];
 	int row;
 	final int DefaultRow = 20;
 	final int ChessBlack=2;
 	final int ChessWhite=1;
 	int first;
 	boolean started;
-	ArrayDeque<Step> stack;
+	ArrayDeque<P> stack;
 	int curr_player;
 	Five_UI ui;
 	public static final int WEST=0;
@@ -33,21 +34,21 @@ public class Five_Game {
 					};
 	int modeScore[] = {
 					100,
-					200,
-					400,
-					200,
-					2000,
-					300,
-					400,
-					400,
+					500,
+					1000,
+					500,
+					3000,
+					600,
+					600,
+					600,
 					100000
 	};
 	int modePunish[] = {
 			0,
-			100,
-			300,
-			100,
-			1500,
+			400,
+			900,
+			400,
+			2400,
 			0,
 			0,
 			0,
@@ -57,6 +58,10 @@ public class Five_Game {
 	{
 		return status;
 	}
+	public int[][][] getScore()
+	{
+		return scores;
+	}
 	public Five_Game()
 	{
 		row=DefaultRow+1;
@@ -65,10 +70,14 @@ public class Five_Game {
 		first=0;
 		players = new int[2];
 		status = new int[row][row];
+		scores = new int [2][row][row];
 		enableMouse = true;
 		count =0;
-		stack = new ArrayDeque<Step>();
+		stack = new ArrayDeque<P>();
+		dict();
+		printDict();
 		ui = new Five_UI(this);
+		
 	}
 	public void setPlayer(int pos,int fp)
 	{
@@ -80,8 +89,8 @@ public class Five_Game {
 		if(stack.size()<2)return;
 		for(int i=0;i<2;i++)
 		{	
-			Step tmp = stack.pop();
-			status[tmp.getX()][tmp.getY()] = 0;
+			P tmp = stack.pop();
+			status[tmp.x][tmp.y] = 0;
 		}
 		count-=2;
 		ui.fb.updateUI();
@@ -92,7 +101,9 @@ public class Five_Game {
 		if ((!inBoard(x,y))||status[x][y] != 0)
 			return;
 		status[x][y] = curr_player + 1;
-		this.stack.push(new Step(x,y));
+		P step = new P(x,y,curr_player+1);
+		this.stack.push(step);
+		this.refreshScore(step);
 		ui.fb.updateUI();
 		if(checkWin(x,y))
 		{
@@ -104,6 +115,7 @@ public class Five_Game {
 		count++;
 		curr_player = 1 - curr_player;
 		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
+	
 	}
 	public boolean checkWin(int x, int y )
 	{
@@ -183,8 +195,6 @@ public class Five_Game {
 			
 		}
 		return true;
-		
-		
 	}
 	public void StartGame()
 	{
@@ -194,12 +204,40 @@ public class Five_Game {
 		count=0;
 		ui.fb.updateUI();
 	}
+	public void refreshScore(P p)
+	{
+		
+		for(int k=0;k<2;k++)
+		{
+			p.setColor(k+1);
+			scores[k][p.x][p.y] = 0;
+			for( int i=0;i<4;i++)
+			{
+				p.setDirect(i);
+				for( int j=1;j<5;j++)
+				{
+					P tmp = p.inc(j);
+					if(this.isAvailable(tmp))
+					{
+						scores[k][tmp.x][tmp.y]=getScore(tmp);
+					}
+				}
+				for( int j=1;j<5;j++)
+				{
+					P tmp = p.inc(-j);
+					if(this.isAvailable(tmp))
+					{
+						scores[k][tmp.x][tmp.y]=getScore(tmp);
+					}
+				}
+			}
+		}
+	}
 	public void NewGame()
 	{
 		//curr_player = first;
 		ui.initStatus();
 		started = false;
-		
 	}
 	public P getAvailableLength(P p,int direct)
 	{
@@ -216,7 +254,7 @@ public class Five_Game {
 			tmp = tmp.inc();
 		}
 		tmp = p.inc(-1);
-		for(;i1<4;i1++)
+		for(;i2<4;i2++)
 		{
 			if(!this.inBoard(tmp)||((status[tmp.x][tmp.y]!=0)&&!(status[tmp.x][tmp.y]==p.color)))
 			{
@@ -240,6 +278,11 @@ public class Five_Game {
 	public int getScoreLv2(P p)
 	{
 		int s=0;
+		for(int i=0;i<4;i++)
+		{
+			this.getAvailableLength(p.setDirect(i));
+			s+=this.getLineScoreLv2(p);
+		}
 		return s;
 	}
 	public int getScoreLv1(P p)
@@ -254,7 +297,36 @@ public class Five_Game {
 	}
 	public int getLineScoreLv2(P p)
 	{
-		int s= 0;
+		int len = p.l+p.r+1;
+		if(len<5)return 0;
+		int s=0;
+		int bs[] = new int[len];
+		int count = 0;
+		for( int i=p.l;i>0;i--)
+		{
+			P tmp = p.inc(i);
+			if(status[tmp.x][tmp.y]==p.color)
+			{
+				bs[count++]=1;
+			}else
+			{
+				bs[count++]=0;
+			}
+		}
+		bs[count++]=1;
+		for( int i=1;i<=p.r;i++)
+		{
+			P tmp = p.inc(-i);
+			if(status[tmp.x][tmp.y]==p.color)
+			{
+				bs[count++]=1;
+			}else
+			{
+				bs[count++]=0;
+			}
+		}
+		int n= getBSValue(bs);
+		s = dict[len-5][n];
 		return s;
 	}
 	public int getLineScoreLv1(P p)
@@ -296,19 +368,56 @@ public class Five_Game {
 	{
 		return inBoard(x,y)&&(status[x][y]==0);
 	}
-	public void dict()
+	public String getBSofValue(int BS,int length)
 	{
-		int size = 1<<9;
-		int dict[][] = new int[5][size];
-		for(int i=0;i<5;i++)
+		String t = "";
+		for(int k=0;k<length+5;k++)
 		{
-			for(int j=0;j<size;j++)
+			if((BS&(1<<k))!=0)
 			{
-				
+				t+="1";
+			}else
+			{
+				t+="0";
 			}
 		}
-		BitSet bs = new BitSet(5);
-		//for()
+		return t;
+	}
+	public void printDict()
+	{
+		for(int i=0;i<5;i++)
+		{
+			int l = 5+i;
+			for(int j=0;j<dict[i].length;j++)
+			{
+				if(dict[i][j]!=0)
+				{
+					String t = "";
+					for(int k=0;k<i+5;k++)
+					{
+						if((j&(1<<k))!=0)
+						{
+							t+="1";
+						}else
+						{
+							t+="0";
+						}
+					}
+					t+=" : "+dict[i][j];
+					System.out.println(t);
+				}
+			}
+		}
+	}
+	public void dict()
+	{
+		for(int i=5;i<10;i++)
+		{
+			for(int j=0;j<mode.length;j++)
+			{
+				writeDict(j,i);
+			}
+		}
 		
 	}
 
@@ -322,11 +431,15 @@ public class Five_Game {
 	}
 	public void writeDict(int modeNum,int curr_array[],int dictNum,int pos,int curr)
 	{
-		int d[] = dict[dictNum];
+		int d[] = dict[dictNum-5];
 		if(curr >= dictNum)
 		{
 			int n = getBSValue(curr_array);
-			int score = 1;//FIXME
+			int score = modeScore[modeNum];//FIXME
+			if(pos==0||pos+mode[modeNum].length==dictNum)
+			{
+				score -= modePunish[modeNum];
+			}
 			if(d[n]<score)d[n]=score;
 			return;
 		}

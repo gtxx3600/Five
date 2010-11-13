@@ -21,13 +21,17 @@ public class Five_UI extends JFrame{
 	}
 	public Five_UI(Five_Game f)
 	{
+		
 		super("Five Chess");
+		//this.setSize(1200,700);
 		fg=f;
 		String options1[] = {"Human","Computer"};
 		String options2[] = {"Player1","Player2"};
 		fb=new Five_Board(f);
 		//fb.setSize(500, 500);
-		fb.setPreferredSize(new Dimension(600,600));
+		JScrollPane jsp = new JScrollPane(fb);
+		jsp.setPreferredSize(new Dimension(600,600));
+		fb.setPreferredSize(new Dimension(1200,1200));
 		rightPanel1 = new JPanel();
 		rightPanel2 = new JPanel();
 		
@@ -142,7 +146,7 @@ public class Five_UI extends JFrame{
 		con.gridy=0;
 		
 		c.setLayout(new GridBagLayout());
-		c.add(fb,con);
+		c.add(jsp,con);
 		con.gridx=1;
 		
 		con.anchor = GridBagConstraints.PAGE_START;
@@ -150,6 +154,7 @@ public class Five_UI extends JFrame{
 		this.initStatus();
 		
 		pack();
+		
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
