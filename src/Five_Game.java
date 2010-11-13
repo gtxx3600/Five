@@ -19,7 +19,40 @@ public class Five_Game {
 	
 	public static final int SCORE_LEVEL_1 = 8;
 	boolean enableMouse;
-	
+	int dict[][] = new int[5][1<<9];
+	int mode[][] = {
+					{1,0,1,0,1},
+					{1,1,0,1},
+					{1,1,1},
+					{1,0,1,1},
+					{1,1,1,1},
+					{1,1,0,1,1},
+					{1,0,1,1,1},
+					{1,1,1,0,1},
+					{1,1,1,1,1}
+					};
+	int modeScore[] = {
+					100,
+					200,
+					400,
+					200,
+					2000,
+					300,
+					400,
+					400,
+					100000
+	};
+	int modePunish[] = {
+			0,
+			100,
+			300,
+			100,
+			1500,
+			0,
+			0,
+			0,
+			0
+};
 	public int[][] getStat()
 	{
 		return status;
@@ -275,36 +308,53 @@ public class Five_Game {
 			}
 		}
 		BitSet bs = new BitSet(5);
-		for()
+		//for()
 		
 	}
-	public void writeDict(int mode[],int score,int availableLength)
+
+	public void writeDict(int modeNum,int dictNum)
 	{
-		
+		for(int i=0;i<dictNum-mode[modeNum].length;i++)
+		{
+			int curr_array[] = new int[dictNum];
+			writeDict(modeNum,curr_array,dictNum,i,0);
+		}
 	}
-	public int getBSValue(BitSet b)
+	public void writeDict(int modeNum,int curr_array[],int dictNum,int pos,int curr)
+	{
+		int d[] = dict[dictNum];
+		if(curr >= dictNum)
+		{
+			int n = getBSValue(curr_array);
+			int score = 1;//FIXME
+			if(d[n]<score)d[n]=score;
+			return;
+		}
+		if(curr == pos)
+		{
+			for(int i=0;i<mode[modeNum].length;i++)
+			{
+				curr_array[curr+i] = mode[modeNum][i];
+			}
+			curr = pos+mode[modeNum].length;
+			writeDict(modeNum,curr_array,dictNum,pos,curr);
+			return;
+		}
+		curr_array[curr] = 0;
+		writeDict(modeNum,curr_array,dictNum,pos,curr+1);
+		curr_array[curr] = 1;
+		writeDict(modeNum,curr_array,dictNum,pos,curr+1);
+	}
+	public int getBSValue(int b[])
 	{
 		int ret=0;
-		for(int i = b.nextSetBit(0);i>=0;i=b.nextSetBit(i))
-		{
-			ret+=1<<i;
+		for(int i=0;i<b.length;i++)	{
+			if(b[i]==1)
+			{
+				ret+=1<<i;
+			}
 		}
 		return ret;
 	}
-	public BitSet getBitSet(int i)
-	{
-		if(i<0)return null;
-		BitSet b = new BitSet();
-		int count=0;
-		while(i>0)
-		{
-			if(i%2==1)
-			{
-				b.set(count);
-			}
-			i>>>=1;
-			count++;
-		}
-		return b;
-	}
+
 }
