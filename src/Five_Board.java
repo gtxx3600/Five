@@ -90,16 +90,16 @@ public class Five_Board extends JPanel implements MouseListener {
 		g2d.setPaint(Color.black);
 		for (int i = 0; i < (fg.DefaultRow + 1); i++) {
 			for (int j = 0; j < (fg.DefaultRow + 1); j++) {
-				if (score[0][i][j] != 0) {
-					g2d.drawString(""+score[0][i][j], xOffset + i * rowPixels, yOffset	+ j * rowPixels);
+				if (score[1][i][j] != 0) {
+					g2d.drawString(""+score[1][i][j], xOffset + i * rowPixels, yOffset	+ j * rowPixels);
 				}
 			}
 		}
 		g2d.setPaint(Color.white);
 		for (int i = 0; i < (fg.DefaultRow + 1); i++) {
 			for (int j = 0; j < (fg.DefaultRow + 1); j++) {
-				if (score[1][i][j] != 0) {
-					g2d.drawString(""+score[1][i][j], xOffset + i * rowPixels, yOffset	+ j * rowPixels - 15);
+				if (score[0][i][j] != 0) {
+					g2d.drawString(""+score[0][i][j], xOffset + i * rowPixels, yOffset	+ j * rowPixels - 15);
 				}
 			}
 		}

@@ -17,8 +17,10 @@ public class Five_Game {
 	public static final int NORTH_WEST=1;
 	public static final int NORTH=2;
 	public static final int NORTH_EAST=3;
-	
 	public static final int SCORE_LEVEL_1 = 8;
+	
+	public static final int WIN_FLAG = 100000;
+	public static final int WARN_FLAG = 1500;
 	boolean enableMouse;
 	int dict[][] = new int[5][1<<9];
 	int mode[][] = {
@@ -34,21 +36,21 @@ public class Five_Game {
 					};
 	int modeScore[] = {
 					100,
-					500,
+					750,
 					1000,
-					500,
+					750,
 					3000,
-					600,
-					600,
-					600,
+					750,
+					750,
+					750,
 					100000
 	};
 	int modePunish[] = {
 			0,
-			400,
+			650,
 			900,
-			400,
-			2400,
+			650,
+			1500,
 			0,
 			0,
 			0,
@@ -91,9 +93,46 @@ public class Five_Game {
 		{	
 			P tmp = stack.pop();
 			status[tmp.x][tmp.y] = 0;
+			refreshScore(tmp);
 		}
 		count-=2;
 		ui.fb.updateUI();
+	}
+	public P selectPointToGo(int pn)
+	{
+		int opp = 1 - pn;
+		ArrayList<P> a[] = new ArrayList[3];
+		a[0] = new ArrayList<P>();
+		a[1] = new ArrayList<P>();
+		a[2] = new ArrayList<P>();
+		for(int i=0;i<this.row;i++)
+		{
+			for(int j=0;j<this.row;j++)
+			{
+				a[0].add(new P(i,j).setScore(scores[0][i][j]));
+				a[1].add(new P(i,j).setScore(scores[1][i][j]));
+				a[2].add(new P(i,j).setScore(scores[1][i][j]+scores[0][i][j]));
+			}
+		}
+		Collections.sort(a[0]);
+		Collections.sort(a[1]);
+		Collections.sort(a[2]);
+		if(a[pn].get(0).score >= WIN_FLAG)
+		{
+			return a[pn].get(0);
+		}
+		if(a[opp].get(0).score >= WIN_FLAG)
+		{
+			return a[opp].get(0);
+		}
+		if(a[opp].get(0).score >= WARN_FLAG)
+		{
+			return a[opp].get(0);
+		}
+		System.out.println("NOT EMERGENCY SELECT MAX_SCORE_SUM");
+		return a[2].get(0);
+	
+		
 	}
 	public void move(int x,int y)
 	{
@@ -114,6 +153,21 @@ public class Five_Game {
 		
 		count++;
 		curr_player = 1 - curr_player;
+		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
+		P next = this.selectPointToGo(curr_player);
+		System.out.println("AI select "+next.x+","+next.y);
+		status[next.x][next.y] = curr_player+1;
+		P step2 = new P(next.x,next.y,curr_player+1);
+		this.stack.push(step2);
+		this.refreshScore(step2);
+		ui.fb.updateUI();
+		if(checkWin(next.x,next.y))
+		{
+			ui.LTurns.setText("Player"+(1+curr_player)+" WIN!!");
+			this.NewGame();
+			return;
+		}
+		count++;curr_player = 1 - curr_player;
 		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
 	
 	}
@@ -200,6 +254,7 @@ public class Five_Game {
 	{
 		curr_player = first;
 		status = new int[21][21];
+		scores = new int [2][row][row];
 		started = true;
 		count=0;
 		ui.fb.updateUI();
@@ -210,7 +265,12 @@ public class Five_Game {
 		for(int k=0;k<2;k++)
 		{
 			p.setColor(k+1);
-			scores[k][p.x][p.y] = 0;
+			if(this.isAvailable(p))
+			{
+				scores[k][p.x][p.y]=getScore(p);
+			}else{
+				scores[k][p.x][p.y] = 0;
+			}
 			for( int i=0;i<4;i++)
 			{
 				p.setDirect(i);
@@ -338,6 +398,7 @@ public class Five_Game {
 			if(status[tmp.x][tmp.y] == p.color)
 			{
 				s+= (int)(1<<(4-i));
+				break;
 			}
 			tmp = tmp.inc();
 		}
@@ -347,6 +408,7 @@ public class Five_Game {
 			if(status[tmp.x][tmp.y] == p.color)
 			{
 				s+= (int)(1<<(4-i));
+				break;
 			}
 			tmp = tmp.inc(-1);
 		}
