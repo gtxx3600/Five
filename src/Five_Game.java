@@ -50,7 +50,7 @@ public class Five_Game {
 			650,
 			900,
 			650,
-			1500,
+			2100,
 			0,
 			0,
 			0,
@@ -59,6 +59,13 @@ public class Five_Game {
 	public int[][] getStat()
 	{
 		return status;
+	}
+	public P getLastStep()
+	{
+		if(stack.size()>0)
+			return stack.getFirst();
+		else
+			return null;
 	}
 	public int[][][] getScore()
 	{
@@ -143,6 +150,7 @@ public class Five_Game {
 		P step = new P(x,y,curr_player+1);
 		this.stack.push(step);
 		this.refreshScore(step);
+		
 		ui.fb.updateUI();
 		if(checkWin(x,y))
 		{
@@ -154,22 +162,8 @@ public class Five_Game {
 		count++;
 		curr_player = 1 - curr_player;
 		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
-		P next = this.selectPointToGo(curr_player);
-		System.out.println("AI select "+next.x+","+next.y);
-		status[next.x][next.y] = curr_player+1;
-		P step2 = new P(next.x,next.y,curr_player+1);
-		this.stack.push(step2);
-		this.refreshScore(step2);
-		ui.fb.updateUI();
-		if(checkWin(next.x,next.y))
-		{
-			ui.LTurns.setText("Player"+(1+curr_player)+" WIN!!");
-			this.NewGame();
-			return;
-		}
-		count++;curr_player = 1 - curr_player;
-		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
-	
+		
+		this.AIHelp();
 	}
 	public boolean checkWin(int x, int y )
 	{
@@ -255,13 +249,35 @@ public class Five_Game {
 		curr_player = first;
 		status = new int[21][21];
 		scores = new int [2][row][row];
+		scores[0][10][10] = 100;
+		scores[1][10][10] = 100;
 		started = true;
+		stack.clear();
 		count=0;
 		ui.fb.updateUI();
 	}
-	public void refreshScore(P p)
+	public void AIHelp()
 	{
+		P next = this.selectPointToGo(curr_player);
+		System.out.println("AI select "+next.x+","+next.y +" for player"+curr_player);
+		status[next.x][next.y] = curr_player+1;
+		P step2 = new P(next.x,next.y,curr_player+1);
+		this.stack.push(step2);
+		this.refreshScore(step2);
+		count++;curr_player = 1 - curr_player;
+		ui.fb.updateUI();
+		if(checkWin(next.x,next.y))
+		{
+			ui.LTurns.setText("Player"+(1+curr_player)+" WIN!!");
+			this.NewGame();
+			return;
+		}
 		
+		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
+	}
+	public void refreshScore(P pp)
+	{
+		P p = new P(pp);
 		for(int k=0;k<2;k++)
 		{
 			p.setColor(k+1);

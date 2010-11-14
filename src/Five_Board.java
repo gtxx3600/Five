@@ -84,6 +84,20 @@ public class Five_Board extends JPanel implements MouseListener {
 				}
 			}
 		}
+		P last = fg.getLastStep();
+		if(last != null){	
+			if(last.color == 2)
+			{
+				g2d.setPaint(Color.black);
+			}else
+			{
+				g2d.setPaint(Color.white);
+			}
+			g2d.drawArc(xOffset + last.x * rowPixels - rowPixels/2, yOffset + last.y * rowPixels - rowPixels/2, rowPixels, rowPixels, 30, 30);
+			g2d.drawArc(xOffset + last.x * rowPixels - rowPixels/2, yOffset + last.y * rowPixels - rowPixels/2, rowPixels, rowPixels, 120, 30);
+			g2d.drawArc(xOffset + last.x * rowPixels - rowPixels/2, yOffset + last.y * rowPixels - rowPixels/2, rowPixels, rowPixels, -30, -30);
+			g2d.drawArc(xOffset + last.x * rowPixels - rowPixels/2, yOffset + last.y * rowPixels - rowPixels/2, rowPixels, rowPixels, -120, -30);
+		}
 	}
 	private void paintScore(Graphics2D g2d) {
 		int[][][] score = fg.getScore();

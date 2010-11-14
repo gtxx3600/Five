@@ -9,7 +9,7 @@ public class Five_UI extends JFrame{
 	JLabel LTurns;
 	JComboBox CBPlayer1,CBPlayer2,CBFirst;
 	JLabel LPlayer1,LPlayer2,LFirst;
-	JButton BRegret,BNew,BStart;
+	JButton BRegret,BNew,BStart,BAI;
 	public void initStatus()
 	{
 		//LTurns.setText("Waiting for new game...");
@@ -72,7 +72,13 @@ public class Five_UI extends JFrame{
 		LPlayer2 = new JLabel("Choose Player2(Black) Type: ");
 		LFirst = new JLabel("Choose First Player: ");
 		LTurns = new JLabel("Waiting for new game...");
-		
+		BAI = new JButton("AI HELP");
+		BAI.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent event)
+			{
+				AIHelp();
+			}
+		});
 		BRegret = new JButton("Regret");
 		BRegret.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent event)
@@ -96,8 +102,8 @@ public class Five_UI extends JFrame{
 		});
 		
 		
-		BoxLayout vbox1 = new BoxLayout(rightPanel1,BoxLayout.Y_AXIS);
-		BoxLayout vbox2 = new BoxLayout(rightPanel2,BoxLayout.Y_AXIS);
+		//BoxLayout vbox1 = new BoxLayout(rightPanel1,BoxLayout.Y_AXIS);
+		//BoxLayout vbox2 = new BoxLayout(rightPanel2,BoxLayout.Y_AXIS);
 		rightPanel1.setLayout(new GridBagLayout());
 		//setSize(600,800);
 		GridBagConstraints con = new GridBagConstraints();
@@ -133,6 +139,9 @@ public class Five_UI extends JFrame{
 		con.gridy=4;
 
 		rightPanel1.add(BStart,con);
+		con.gridx=1;
+		rightPanel1.add(BAI,con);
+		con.gridx=0;
 		con.gridy = 5;
 		rightPanel1.add(LTurns,con);
 
@@ -168,7 +177,7 @@ public class Five_UI extends JFrame{
 		this.BRegret.setEnabled(true);
 		this.LTurns.setText("Player"+(fg.first+1)+"'s Turn...");
 		fg.StartGame();
-		
+		fg.AIHelp();
 	}
 	public void NewGame()
 	{
@@ -179,6 +188,10 @@ public class Five_UI extends JFrame{
 	{
 		fg.Regret();
 		//this.fb.updateUI();
+	}
+	public void AIHelp()
+	{
+		fg.AIHelp();
 	}
 
 }

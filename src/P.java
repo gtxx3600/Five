@@ -14,6 +14,16 @@ public class P implements Comparable<P>{// Represent Point or Tuple
 		direct = -1;
 		score = -1;
 	}
+	public P(P p)
+	{
+		x = p.x;
+		y = p.y;
+		l = p.l;
+		r = p.r;
+		color = p.color;
+		direct = p.direct;
+		score = p.score ;
+	}
 	public P(int a,int b,int c)
 	{
 		x=a;y=b;direct=-1;
@@ -92,4 +102,5 @@ public class P implements Comparable<P>{// Represent Point or Tuple
 		// TODO Auto-generated method stub
 		return -1;
 	}
+	
 }
