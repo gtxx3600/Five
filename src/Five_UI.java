@@ -1,8 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.GroupLayout.*;
+
 public class Five_UI extends JFrame{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Five_Game fg;
 	Five_Board fb;
 	JPanel rightPanel1,rightPanel2;
@@ -148,7 +152,7 @@ public class Five_UI extends JFrame{
 		
 		Container c = getContentPane();
 		
-		BoxLayout hBox = new BoxLayout(c,BoxLayout.X_AXIS);
+		
 		con.fill = GridBagConstraints.NONE;
 		con.anchor = GridBagConstraints.CENTER;
 		con.gridx=0;

@@ -73,6 +73,7 @@ public class Five_Game {
 	}
 	public Five_Game()
 	{
+		//test
 		row=DefaultRow+1;
 		started=false;
 		curr_player =0;

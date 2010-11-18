@@ -1,4 +1,4 @@
-import java.util.*;
+//import java.util.*;
 public class P implements Comparable<P>{// Represent Point or Tuple
 	public int x,y;
 	public int l,r;

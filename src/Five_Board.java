@@ -6,6 +6,11 @@ import javax.swing.*;
 
 public class Five_Board extends JPanel implements MouseListener {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @param args
 	 */
 	int row;
