@@ -23,7 +23,9 @@ public class Five_Game {
 	public static final int WARN_FLAG = 1500;
 	boolean enableMouse;
 	int dict[][] = new int[5][1<<9];
-	int mode[][] = {
+	int mode[][] = {{1,1},
+					{1,0,1},
+					{1,0,0,1},
 					{1,0,1,0,1},
 					{1,1,0,1},
 					{1,1,1},
@@ -36,6 +38,9 @@ public class Five_Game {
 					};
 	int modeScore[] = {
 					100,
+					75,
+					50,
+					200,
 					750,
 					1000,
 					750,
@@ -46,10 +51,13 @@ public class Five_Game {
 					100000
 	};
 	int modePunish[] = {
+			75,
+			50,
+			25,
 			0,
-			650,
-			900,
-			650,
+			550,
+			800,
+			550,
 			2100,
 			0,
 			0,
@@ -136,6 +144,9 @@ public class Five_Game {
 		if(a[opp].get(0).score >= WARN_FLAG)
 		{
 			return a[opp].get(0);
+		}else if(a[pn].get(0).score >= 150)
+		{
+			return a[pn].get(0);
 		}
 		System.out.println("NOT EMERGENCY SELECT MAX_SCORE_SUM");
 		return a[2].get(0);
@@ -265,7 +276,7 @@ public class Five_Game {
 		P step2 = new P(next.x,next.y,curr_player+1);
 		this.stack.push(step2);
 		this.refreshScore(step2);
-		count++;curr_player = 1 - curr_player;
+		
 		ui.fb.updateUI();
 		if(checkWin(next.x,next.y))
 		{
@@ -273,7 +284,7 @@ public class Five_Game {
 			this.NewGame();
 			return;
 		}
-		
+		count++;curr_player = 1 - curr_player;
 		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
 	}
 	public void refreshScore(P pp)
@@ -497,12 +508,12 @@ public class Five_Game {
 				writeDict(j,i);
 			}
 		}
-		
+		//this.printDict();
 	}
 
 	public void writeDict(int modeNum,int dictNum)
 	{
-		for(int i=0;i<dictNum-mode[modeNum].length;i++)
+		for(int i=0;i<=dictNum-mode[modeNum].length;i++)
 		{
 			int curr_array[] = new int[dictNum];
 			writeDict(modeNum,curr_array,dictNum,i,0);
