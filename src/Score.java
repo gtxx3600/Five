@@ -2,15 +2,16 @@
 public class Score implements Comparable<Score>{
 	int score;
 	int type[];
+	final public static int s2[] = {12,13,14};
+	final public static int l2[] = {0,1,2};
 	final public static int l3[] = {4,5,6};
 	final public static int l4[] = {7};
 
-	final public static int l34[] = {4,5,6,7,8,9,10};
-	final public static int s3[] = {16,17,18};
+	final public static int l34[] = {4,5,6,7};
+	final public static int s3[] = {3,15,16,17,18};
 	final public static int s4[] = {8,9,10,19,20,21,22};
-	final public static int s4l3[] = {4,5,6,19,20,21,22};
+	final public static int s4l3[] = {4,5,6,8,9,10,19,20,21,22};
 	final public static int s34[] = {16,17,18,19,20,21,22};
-	final public static int w4[] = {7};
 	final public static int win[] = {11,23};
 	final public static int t_s_dict[] = {
 		100,

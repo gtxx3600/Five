@@ -14,8 +14,8 @@ public class Five_Board extends JPanel implements MouseListener {
 	 * @param args
 	 */
 	int row;
-
-	int DefaultWidth = 1200;
+	boolean debug;
+	int DefaultWidth = 600;
 	int rowPixels = 20;
 	Five_Game fg;
 	int xOffset = 10;
@@ -31,7 +31,7 @@ public class Five_Board extends JPanel implements MouseListener {
 		super();
 		fg = f;
 		row = fg.DefaultRow;
-
+		
 	}
 
 	public Five_Board(Five_Game f) {
@@ -39,12 +39,15 @@ public class Five_Board extends JPanel implements MouseListener {
 		fg = f;
 		row = fg.DefaultRow;
 		addMouseListener(this);
+		init();
+	}
+	private void init()
+	{
 		DefaultWidth = (DefaultWidth / 24) * 24;
 		xOffset = yOffset = DefaultWidth / 12;
 		rowPixels = xOffset / 2;
 		chessDiameter = ((double) rowPixels) * 0.8;
 	}
-
 	private void paintBoard(Graphics2D g2d) {
 		g2d.setPaint(new Color(200, 135, 5));
 		g2d.fillRect(0, 0, DefaultWidth, DefaultWidth);
@@ -125,11 +128,20 @@ public class Five_Board extends JPanel implements MouseListener {
 	}
 	public void paint(Graphics g) {
 		super.paint(g);
-		// setSize(DefaultWidth,DefaultWidth);
+		if(!fg.debug)
+		{
+			this.DefaultWidth = 600;
+		}else
+		{
+			this.DefaultWidth = 1200;
+		}
+		this.init();
 		Graphics2D g2d = (Graphics2D) g;
 		paintBoard(g2d);
 		paintChess(g2d);
-		paintScore(g2d);
+		if(fg.debug){
+			paintScore(g2d);
+		}
 	}
 
 	@Override
@@ -139,8 +151,6 @@ public class Five_Board extends JPanel implements MouseListener {
 		int y = event.getY();
 		int r = (x - xOffset + (rowPixels / 2)) / rowPixels;
 		int c = (y - yOffset + (rowPixels / 2)) / rowPixels;
-//		System.out.println("X:" + x + " Y:" + y + "R:" + r + " C:" + c
-//				+ "Defw:" + this.DefaultWidth + " xoff:" + this.xOffset);
 		if (Math.abs(x - (r * rowPixels + xOffset)) < rowPixels*8/10 && Math.abs(y - (c * rowPixels + yOffset)) < rowPixels*8/10) {
 			
 			fg.move(r, c);

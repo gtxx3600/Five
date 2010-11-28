@@ -8,17 +8,18 @@ public class Five_UI extends JFrame{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Five_Game fg;
+
 	Five_Board fb;
 	JPanel rightPanel1,rightPanel2;
 	JLabel LTurns;
-	JComboBox CBPlayer1,CBPlayer2,CBFirst;
+	JComboBox CBDebug,CBDifficulty,CBFirst;
 	JLabel LPlayer1,LPlayer2,LFirst;
 	JButton BRegret,BNew,BStart,BAI;
 	public void initStatus()
 	{
 		//LTurns.setText("Waiting for new game...");
-		this.CBPlayer1.setEnabled(true);
-		this.CBPlayer2.setEnabled(true);
+		this.CBDebug.setEnabled(true);
+		this.CBDifficulty.setEnabled(true);
 		this.CBFirst.setEnabled(true);
 		this.BStart.setEnabled(true);
 		this.BRegret.setEnabled(false);
@@ -29,39 +30,41 @@ public class Five_UI extends JFrame{
 		super("Five Chess");
 		//this.setSize(1200,700);
 		fg=f;
-		String options1[] = {"Human","Computer"};
-		String options2[] = {"Player1","Player2"};
+		String options1[] = {"Computer","Human"};
+		String options2[] = {"Esay","Normal","Hard","VeryHard"};
+		String options3[] = {"Normal","Debug"};
 		fb=new Five_Board(f);
 		//fb.setSize(500, 500);
 		JScrollPane jsp = new JScrollPane(fb);
 		jsp.setPreferredSize(new Dimension(600,600));
+		
 		fb.setPreferredSize(new Dimension(1200,1200));
 		rightPanel1 = new JPanel();
 		rightPanel2 = new JPanel();
 		
-		CBPlayer1 = new JComboBox(options1);
-		CBPlayer1.addItemListener(new ItemListener()
+		CBDebug = new JComboBox(options3);
+		CBDebug.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent event)
 			{
 				if(event.getStateChange()==ItemEvent.SELECTED)
 				{
-					fg.setPlayer(0, CBPlayer1.getSelectedIndex());
+					fg.setMode(CBDebug.getSelectedIndex());
 				}
 			}
 		});
-		CBPlayer2 = new JComboBox(options1);
-		CBPlayer2.addItemListener(new ItemListener()
+		CBDifficulty = new JComboBox(options2);
+		CBDifficulty.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent event)
 			{
 				if(event.getStateChange()==ItemEvent.SELECTED)
 				{
-					fg.setPlayer(1, CBPlayer2.getSelectedIndex());
+					fg.setDiff(CBDifficulty.getSelectedIndex());
 				}
 			}
 		});
-		CBFirst = new JComboBox(options2);
+		CBFirst = new JComboBox(options1);
 		CBFirst.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent event)
@@ -72,8 +75,8 @@ public class Five_UI extends JFrame{
 				}
 			}
 		});
-		LPlayer1 = new JLabel("Choose Player1(White) Type: ");
-		LPlayer2 = new JLabel("Choose Player2(Black) Type: ");
+		LPlayer1 = new JLabel("Choose Game Mode: ");
+		LPlayer2 = new JLabel("Choose Difficulty: ");
 		LFirst = new JLabel("Choose First Player: ");
 		LTurns = new JLabel("Waiting for new game...");
 		BAI = new JButton("AI HELP");
@@ -120,9 +123,9 @@ public class Five_UI extends JFrame{
 		con.ipady=4;
 		rightPanel1.add(LPlayer1,con);
 		con.gridx=1;
-		rightPanel1.add(CBPlayer1,con);
+		rightPanel1.add(CBDebug,con);
 		con.gridy=1;
-		rightPanel1.add(CBPlayer2,con);
+		rightPanel1.add(CBDifficulty,con);
 		con.gridx=0;
 		rightPanel1.add(LPlayer2,con);
 		con.gridx=0;
@@ -174,8 +177,8 @@ public class Five_UI extends JFrame{
 	}
 	public void StartGame()
 	{
-		this.CBPlayer1.setEnabled(false);
-		this.CBPlayer2.setEnabled(false);
+		this.CBDebug.setEnabled(false);
+		this.CBDifficulty.setEnabled(false);
 		this.CBFirst.setEnabled(false);
 		this.BStart.setEnabled(false);
 		this.BRegret.setEnabled(true);
