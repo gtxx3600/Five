@@ -2,8 +2,10 @@ import java.util.*;
 public class Five_Game {
 	int players[];
 	int count;
+	int depth = 3;
 	public int status[][];
 	public int scores[][][];
+	public Score scores_type[][][];
 	int row;
 	final int DefaultRow = 20;
 	final int ChessBlack=2;
@@ -20,21 +22,26 @@ public class Five_Game {
 	public static final int SCORE_LEVEL_1 = 8;
 	
 	public static final int WIN_FLAG = 100000;
-	public static final int WARN_FLAG = 1500;
+	public static final int WARN_FLAG = 2000;
 	boolean enableMouse;
 	int dict[][] = new int[5][1<<9];
-	int mode[][] = {{1,1},
-					{1,0,1},
-					{1,0,0,1},
-					{1,0,1,0,1},
-					{1,1,0,1},
-					{1,1,1},
-					{1,0,1,1},
-					{1,1,1,1},
-					{1,1,0,1,1},
-					{1,0,1,1,1},
-					{1,1,1,0,1},
-					{1,1,1,1,1}
+	int subdict[][] = new int[5][1<<9];
+	int mode[][] = {{1,1},   			//0
+					{1,0,1},			//1
+					{1,0,0,1},			//2
+					{1,0,1,0,1},		//3
+					
+					{1,1,0,1},			//4
+					{1,1,1},			//5
+					{1,0,1,1},			//6
+					
+					{1,1,1,1},			//7
+					
+					{1,1,0,1,1},		//8
+					{1,0,1,1,1},		//9
+					{1,1,1,0,1},		//10
+					
+					{1,1,1,1,1}			//11
 					};
 	int modeScore[] = {
 					100,
@@ -44,10 +51,10 @@ public class Five_Game {
 					750,
 					1000,
 					750,
-					3000,
+					5000,
 					750,
-					750,
-					750,
+					1100,
+					1100,
 					100000
 	};
 	int modePunish[] = {
@@ -58,10 +65,10 @@ public class Five_Game {
 			550,
 			800,
 			550,
-			2100,
+			4100,
 			0,
-			0,
-			0,
+			350,
+			350,
 			0
 };
 	public int[][] getStat()
@@ -82,6 +89,10 @@ public class Five_Game {
 	public Five_Game()
 	{
 		//test
+//		Set<String> a = new HashSet<String>();
+//		a.add("a");
+//		a.add("a");
+//		System.out.println(a);
 		row=DefaultRow+1;
 		started=false;
 		curr_player =0;
@@ -89,11 +100,12 @@ public class Five_Game {
 		players = new int[2];
 		status = new int[row][row];
 		scores = new int [2][row][row];
+		scores_type = new Score [2][row][row];
 		enableMouse = true;
 		count =0;
 		stack = new ArrayDeque<P>();
 		dict();
-		printDict();
+		//printDict();
 		ui = new Five_UI(this);
 		
 	}
@@ -104,78 +116,110 @@ public class Five_Game {
 	}
 	public void Regret()
 	{
-		if(stack.size()<2)return;
-		for(int i=0;i<2;i++)
-		{	
-			P tmp = stack.pop();
-			status[tmp.x][tmp.y] = 0;
-			refreshScore(tmp);
-		}
-		count-=2;
+		practiseRollbackMove();
+		practiseRollbackMove();
+		confirmRollbackMove();
+	}
+	public void practiseRollbackMove()
+	{
+		if(stack.size()<1)return;
+		P tmp = stack.pop();
+		status[tmp.x][tmp.y] = 0;
+		refreshScore(tmp);
+		count -= 1;
+		curr_player = 1 - curr_player;
+	}
+	public void confirmRollbackMove()
+	{
+		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
 		ui.fb.updateUI();
 	}
+	
+	
 	public P selectPointToGo(int pn)
 	{
-		int opp = 1 - pn;
-		ArrayList<P> a[] = new ArrayList[3];
-		a[0] = new ArrayList<P>();
-		a[1] = new ArrayList<P>();
-		a[2] = new ArrayList<P>();
-		for(int i=0;i<this.row;i++)
-		{
-			for(int j=0;j<this.row;j++)
+		if(count < 10){
+			int opp = 1 - pn;
+			ArrayList<P> a[] = new ArrayList[3];
+			a[0] = new ArrayList<P>();
+			a[1] = new ArrayList<P>();
+			a[2] = new ArrayList<P>();
+			for(int i=0;i<this.row;i++)
 			{
-				a[0].add(new P(i,j).setScore(scores[0][i][j]));
-				a[1].add(new P(i,j).setScore(scores[1][i][j]));
-				a[2].add(new P(i,j).setScore(scores[1][i][j]+scores[0][i][j]));
+				for(int j=0;j<this.row;j++)
+				{
+					a[0].add(new P(i,j).setScore(scores[0][i][j]));
+					a[1].add(new P(i,j).setScore(scores[1][i][j]));
+					a[2].add(new P(i,j).setScore(scores[1][i][j]+scores[0][i][j]));
+				}
 			}
+			Collections.sort(a[0]);
+			Collections.sort(a[1]);
+			Collections.sort(a[2]);
+			if(a[pn].get(0).score >= WIN_FLAG)
+			{
+				return a[pn].get(0);
+			}
+			if(a[opp].get(0).score >= WIN_FLAG)
+			{
+				return a[opp].get(0);
+			}
+			if(a[opp].get(0).score >= WARN_FLAG)
+			{
+				return a[opp].get(0);
+			}else if(a[pn].get(0).score >= 150)
+			{
+				return a[pn].get(0);
+			}
+			System.out.println("NOT EMERGENCY SELECT MAX_SCORE_SUM");
+			return a[2].get(0);
 		}
-		Collections.sort(a[0]);
-		Collections.sort(a[1]);
-		Collections.sort(a[2]);
-		if(a[pn].get(0).score >= WIN_FLAG)
+		if(pn == 0)
 		{
-			return a[pn].get(0);
+			int tmp[] = getMax(Integer.MIN_VALUE,Integer.MAX_VALUE,this.depth);
+			return new P(tmp[1],tmp[2]);
+			
+		}else if(pn == 1)
+		{
+			int tmp[] = getMin(Integer.MIN_VALUE,Integer.MAX_VALUE,this.depth);
+			return new P(tmp[1],tmp[2]);
+		}else
+		{
+			System.err.println("Unknown Player Number :" + pn);
+			return new P(0,0);
 		}
-		if(a[opp].get(0).score >= WIN_FLAG)
-		{
-			return a[opp].get(0);
-		}
-		if(a[opp].get(0).score >= WARN_FLAG)
-		{
-			return a[opp].get(0);
-		}else if(a[pn].get(0).score >= 150)
-		{
-			return a[pn].get(0);
-		}
-		System.out.println("NOT EMERGENCY SELECT MAX_SCORE_SUM");
-		return a[2].get(0);
-	
 		
 	}
 	public void move(int x,int y)
 	{
-		
-		if ((!inBoard(x,y))||status[x][y] != 0)
+		this.practiseMove(x, y);
+		this.confirmMove(x, y);
+		this.AIHelp();
+	}
+	public void practiseMove(int x,int y)
+	{
+		if ((!started)||(!inBoard(x,y))||status[x][y] != 0)
 			return;
 		status[x][y] = curr_player + 1;
 		P step = new P(x,y,curr_player+1);
 		this.stack.push(step);
 		this.refreshScore(step);
-		
-		ui.fb.updateUI();
-		if(checkWin(x,y))
-		{
-			ui.LTurns.setText("Player"+(1+curr_player)+" WIN!!");
-			this.NewGame();
-			return;
-		}
-		
 		count++;
 		curr_player = 1 - curr_player;
-		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
-		
-		this.AIHelp();
+	}
+	public void confirmMove(int x,int y)
+	{
+		if(checkWin(x,y))
+		{
+			ui.LTurns.setText("Player"+(1+(1-curr_player))+" WIN!!");
+			ui.fb.updateUI();
+			this.NewGame();
+			this.started = false;
+			return;
+		}
+		ui.LTurns.setText((1+curr_player)+"'s Turn"+"eval:"+this.evaluation()+"count:"+this.count);
+
+		ui.fb.updateUI();
 	}
 	public boolean checkWin(int x, int y )
 	{
@@ -261,8 +305,11 @@ public class Five_Game {
 		curr_player = first;
 		status = new int[21][21];
 		scores = new int [2][row][row];
+		scores_type = new Score[2][row][row];
 		scores[0][10][10] = 100;
 		scores[1][10][10] = 100;
+		scores_type[0][10][10] = new Score(100);
+		scores_type[1][10][10] = new Score(100);
 		started = true;
 		stack.clear();
 		count=0;
@@ -270,22 +317,14 @@ public class Five_Game {
 	}
 	public void AIHelp()
 	{
+		if(count > 29)
+		{
+			count = count + 0;
+		}
 		P next = this.selectPointToGo(curr_player);
 		System.out.println("AI select "+next.x+","+next.y +" for player"+curr_player);
-		status[next.x][next.y] = curr_player+1;
-		P step2 = new P(next.x,next.y,curr_player+1);
-		this.stack.push(step2);
-		this.refreshScore(step2);
-		
-		ui.fb.updateUI();
-		if(checkWin(next.x,next.y))
-		{
-			ui.LTurns.setText("Player"+(1+curr_player)+" WIN!!");
-			this.NewGame();
-			return;
-		}
-		count++;curr_player = 1 - curr_player;
-		ui.LTurns.setText("Player"+(1+curr_player)+"'s Turn...");
+		this.practiseMove(next.x, next.y);
+		this.confirmMove(next.x, next.y);
 	}
 	public void refreshScore(P pp)
 	{
@@ -295,8 +334,9 @@ public class Five_Game {
 			p.setColor(k+1);
 			if(this.isAvailable(p))
 			{
-				scores[k][p.x][p.y]=getScore(p);
+				scores[k][p.x][p.y] = getScore(p);
 			}else{
+				scores_type[k][p.x][p.y] = null; 
 				scores[k][p.x][p.y] = 0;
 			}
 			for( int i=0;i<4;i++)
@@ -359,6 +399,7 @@ public class Five_Game {
 	public int getScore(P p)
 	{
 		int s=0;
+		scores_type[p.color - 1][p.x][p.y] = new Score();
 		s+=getScoreLv1(p);
 		s+=getScoreLv2(p);
 		return s;
@@ -369,8 +410,9 @@ public class Five_Game {
 		for(int i=0;i<4;i++)
 		{
 			this.getAvailableLength(p.setDirect(i));
-			s+=this.getLineScoreLv2(p);
+			this.getLineScoreLv2(p);
 		}
+		s = scores_type[p.color-1][p.x][p.y].score;
 		return s;
 	}
 	public int getScoreLv1(P p)
@@ -383,10 +425,10 @@ public class Five_Game {
 		}
 		return s;
 	}
-	public int getLineScoreLv2(P p)
+	public void getLineScoreLv2(P p)
 	{
 		int len = p.l+p.r+1;
-		if(len<5)return 0;
+		if(len<5)return ;
 		int s=0;
 		int bs[] = new int[len];
 		int count = 0;
@@ -414,8 +456,9 @@ public class Five_Game {
 			}
 		}
 		int n= getBSValue(bs);
-		s = dict[len-5][n];
-		return s;
+		scores_type[p.color-1][p.x][p.y].addType(dict[len-5][n]-1);
+		//s = dict[len-5][n];
+		//return s;
 	}
 	public int getLineScoreLv1(P p)
 	{
@@ -522,15 +565,28 @@ public class Five_Game {
 	public void writeDict(int modeNum,int curr_array[],int dictNum,int pos,int curr)
 	{
 		int d[] = dict[dictNum-5];
+		int sd[] = subdict[dictNum - 5];
 		if(curr >= dictNum)
 		{
 			int n = getBSValue(curr_array);
-			int score = modeScore[modeNum];//FIXME
+			//int score = modeScore[modeNum];//FIXME
+			
+			int score = modeNum+1;
+			
 			if(pos==0||pos+mode[modeNum].length==dictNum)
 			{
-				score -= modePunish[modeNum];
+				//score -= modePunish[modeNum];
+				score += 12;
+			}else if(modeNum >=8 && modeNum <= 10)
+			{
+				score += 12;
 			}
-			if(d[n]<score)d[n]=score;
+			if(sd[n] == 0 || sd[n] < getBSCount(mode[modeNum]))
+			{
+				sd[n] = getBSCount(mode[modeNum]);
+				d[n] = score;
+			}
+			//if(d[n] == 0 || Score.t_s_dict[d[n]-1]<Score.t_s_dict[score-1])d[n]=score;
 			return;
 		}
 		if(curr == pos)
@@ -558,6 +614,212 @@ public class Five_Game {
 			}
 		}
 		return ret;
+	}	
+	public int getBSCount(int b[])
+	{
+		int ret=0;
+		for(int i=0;i<b.length;i++)	{
+			if(b[i]==1)
+			{
+				ret+=1;
+			}
+		}
+		return ret;
+	}	
+	public int getBitCount(int n)
+	{
+		int ret=0;
+		while(n != 0)
+		{
+			ret += n&1;
+			n >>>= 1;
+		}
+		return ret;
 	}
+	/**
+	 * evaluate the whole chess-board
+	 * @return a score to evaluate the situation
+	 */
+	public int evaluation()
+	{
+		int sum_player1 = 0, sum_player2 = 0;
+		for(int i=0;i<row;i++)
+		{
+			for(int j=0;j<row;j++)
+			{
+				if(scores_type[0][i][j] != null)
+					sum_player1 += scores_type[0][i][j].score;
+				if(scores_type[1][i][j] != null)
+					sum_player2 += scores_type[1][i][j].score;
+			}
+		}
+		return sum_player1 - sum_player2;
+	}
+	/**
+	 * 
+	 * @param pn (PlayerNum)
+	 * @return possible-move list
+	 */ 
+	public Set<P> getPossibleMove(int pn)
+	{
+		int opp = 1 - pn;
+		ArrayList<P> a[] = new ArrayList[3];
+		a[0] = new ArrayList<P>();
+		a[1] = new ArrayList<P>();
+		a[2] = new ArrayList<P>();
+		Set<P> ret = new HashSet<P>();
+		for(int i=0;i<this.row;i++)
+		{
+			for(int j=0;j<this.row;j++)
+			{
+				if(scores_type[0][i][j]!=null || scores_type[1][i][j]!=null)
+				{
+					a[0].add(new P(i,j).setScoreType(scores_type[0][i][j]));
+					a[1].add(new P(i,j).setScoreType(scores_type[1][i][j]));
+					a[2].add(new P(i,j).setScore(scores[1][i][j]+scores[0][i][j]));
+				}
+			}
+		}
+		Collections.sort(a[0]);
+		Collections.sort(a[1]);
+		Collections.sort(a[2]);
+		
+		if(a[pn].get(0).score_type.hasTypeInRange(Score.win))
+		{
+			ret.add(a[pn].get(0));
+			return ret;
+		}
+		if(a[opp].get(0).score_type.hasTypeInRange(Score.win))
+		{
+			ret.add(a[opp].get(0));
+			return ret;
+		}
+		for(int i = 0; i < a[pn].size();i++)
+		{
+			P tmp = a[pn].get(i);
+			if(tmp.score_type!=null)
+			{
+				Score st = tmp.score_type;
+				if (st.countTypeInRange(Score.l4) >= 1)
+				{
+					ret.add(tmp);
+					return ret;
+				}else if(st.countTypeInRange(Score.s4) >= 2 || (st.hasTypeInRange(Score.s4)&&st.hasTypeInRange(Score.l3)))
+				{
+					ret.add(tmp);
+					return ret;
+				}
+			}
+		}
+		for(int i = 0; i < a[opp].size();i++)
+		{
+			P tmp = a[opp].get(i);
+			if(tmp.score_type!=null)
+			{
+				Score st = tmp.score_type;
+				if (st.countTypeInRange(Score.l4) >= 1)
+				{
+					ret.add(tmp);
+					return ret;
+				}else if(st.countTypeInRange(Score.s4) >= 2 || (st.hasTypeInRange(Score.s4)&&st.hasTypeInRange(Score.l3)))
+				{
+					ret.add(tmp);
+					return ret;
+				}
+			}
+		}
+		for(int i =0;i<a[2].size();i++)
+		{
+			if(a[2].get(i).score > 300)
+			{
+				ret.add(a[2].get(i));
+			}
+		}
+		//ret.addAll(a[pn]);
+		//ret.addAll(a[opp]);
+		
+		
+		return ret;
+	}
+	public int[] getMax(int alpha,int beta,int depth)
+	{
 
+		int ret[] = {alpha,-1,-1};
+		if(depth == 0)
+		{
+			ret[0] = this.evaluation();
+			return ret;
+		}
+		Set<P> possibleMoves = this.getPossibleMove(0);
+		if(possibleMoves.size() == 0)
+		{
+			return ret;
+		}
+		Iterator<P> it = possibleMoves.iterator();
+		while(it.hasNext())
+		{
+			P pm = it.next();
+			this.practiseMove(pm.x, pm.y);    //pretending go
+			if(this.checkWin(pm.x, pm.y))
+			{
+				ret[0] = Integer.MAX_VALUE;
+				ret[1] = pm.x;
+				ret[2] = pm.y;
+				this.practiseRollbackMove();
+				return ret;
+			}
+			int[] tmp = this.getMin(alpha,beta,depth-1);
+			this.practiseRollbackMove();      //rollback
+			
+			if(tmp[0] > ret[0]){
+				ret[0] = tmp[0];
+				ret[1] = pm.x;
+				ret[2] = pm.y;
+			}
+			if(ret[0] >= beta){
+				return ret;
+			}
+		}
+		return ret;
+	}
+	public int[] getMin(int alpha, int beta, int depth)
+	{
+		int ret[] = {beta,-1,-1};
+		if(depth == 0)
+		{
+			ret[0] = this.evaluation();
+			return ret;
+		}
+		Set<P> possibleMoves = this.getPossibleMove(1);
+		if(possibleMoves.size() == 0)
+		{
+			return ret;
+		}
+		Iterator<P> it = possibleMoves.iterator();
+		while(it.hasNext())
+		{
+			P pm = it.next();
+			this.practiseMove(pm.x, pm.y);    //pretending go
+			if(this.checkWin(pm.x, pm.y))
+			{
+				ret[0] = Integer.MIN_VALUE;
+				ret[1] = pm.x;
+				ret[2] = pm.y;
+				this.practiseRollbackMove();
+				return ret;
+			}
+			int[] tmp = this.getMin(alpha,beta,depth-1);
+			this.practiseRollbackMove();      //rollback
+			
+			if(tmp[0] < ret[0]){
+				ret[0] = tmp[0];
+				ret[1] = pm.x;
+				ret[2] = pm.y;
+			}
+			if(alpha >= ret[0]){
+				return ret;
+			}
+		}
+		return ret;
+	}
 }

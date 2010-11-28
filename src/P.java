@@ -1,3 +1,5 @@
+//import java.util.Comparator;
+
 //import java.util.*;
 public class P implements Comparable<P>{// Represent Point or Tuple
 	public int x,y;
@@ -5,6 +7,7 @@ public class P implements Comparable<P>{// Represent Point or Tuple
 	public int color;
 	int direct;
 	int score;
+	Score score_type;
 	public P(int a,int b)
 	{
 		x = a;
@@ -14,6 +17,13 @@ public class P implements Comparable<P>{// Represent Point or Tuple
 		direct = -1;
 		score = -1;
 	}
+	public P setScoreType(Score s)
+	{
+		score_type = s;
+		if(s!=null)score = s.score;
+		return this;
+	}
+	
 	public P(P p)
 	{
 		x = p.x;
@@ -88,13 +98,11 @@ public class P implements Comparable<P>{// Represent Point or Tuple
 //		if(arg0.score<arg1.score)return -1;
 //		return 0;
 //	}
-//	public boolean equals(P arg0) {
-//		if(arg0.x == x &&
-//			arg0.y == y &&
-//			arg0.score == score &&
-//			arg0.color == color)return true;
-//		return false;
-//	}
+
+	public boolean equals(P arg0) {
+		if(arg0.x == x && arg0.y == y )return true;
+		return false;
+	}
 	@Override
 	public int compareTo(P arg0) {
 		if(arg0.score > score)return 1;
@@ -102,5 +110,6 @@ public class P implements Comparable<P>{// Represent Point or Tuple
 		// TODO Auto-generated method stub
 		return -1;
 	}
+
 	
 }
