@@ -134,7 +134,7 @@ public class Five_Board extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent event) {
-		if(!fg.started||!fg.enableMouse)return;
+		if(!fg.started)return;
 		int x = event.getX();
 		int y = event.getY();
 		int r = (x - xOffset + (rowPixels / 2)) / rowPixels;

@@ -181,7 +181,7 @@ public class Five_UI extends JFrame{
 		this.BRegret.setEnabled(true);
 		this.LTurns.setText("Player"+(fg.first+1)+"'s Turn...");
 		fg.StartGame();
-		fg.AIHelp();
+		
 	}
 	public void NewGame()
 	{

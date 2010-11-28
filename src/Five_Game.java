@@ -2,7 +2,7 @@ import java.util.*;
 public class Five_Game {
 	int players[];
 	int count;
-	int depth = 3;
+	int depth = 5;
 	public int status[][];
 	public int scores[][][];
 	public Score scores_type[][][];
@@ -12,18 +12,18 @@ public class Five_Game {
 	final int ChessWhite=1;
 	int first;
 	boolean started;
-	ArrayDeque<P> stack;
+	ArrayDeque<P> stack;  //
 	int curr_player;
 	Five_UI ui;
+	int level;
 	public static final int WEST=0;
 	public static final int NORTH_WEST=1;
 	public static final int NORTH=2;
 	public static final int NORTH_EAST=3;
 	public static final int SCORE_LEVEL_1 = 8;
-	
 	public static final int WIN_FLAG = 100000;
 	public static final int WARN_FLAG = 2000;
-	boolean enableMouse;
+
 	int dict[][] = new int[5][1<<9];
 	int subdict[][] = new int[5][1<<9];
 	int mode[][] = {{1,1},   			//0
@@ -101,8 +101,9 @@ public class Five_Game {
 		status = new int[row][row];
 		scores = new int [2][row][row];
 		scores_type = new Score [2][row][row];
-		enableMouse = true;
+
 		count =0;
+		level = 0;
 		stack = new ArrayDeque<P>();
 		dict();
 		//printDict();
@@ -138,7 +139,7 @@ public class Five_Game {
 	
 	public P selectPointToGo(int pn)
 	{
-		if(count < 10){
+		if(count < 5){
 			int opp = 1 - pn;
 			ArrayList<P> a[] = new ArrayList[3];
 			a[0] = new ArrayList<P>();
@@ -194,7 +195,7 @@ public class Five_Game {
 	{
 		this.practiseMove(x, y);
 		this.confirmMove(x, y);
-		this.AIHelp();
+		//this.AIHelp();
 	}
 	public void practiseMove(int x,int y)
 	{
@@ -317,7 +318,8 @@ public class Five_Game {
 	}
 	public void AIHelp()
 	{
-		if(count > 29)
+		if(!started)return;
+		if(count > 16)
 		{
 			count = count + 0;
 		}
@@ -586,7 +588,7 @@ public class Five_Game {
 				sd[n] = getBSCount(mode[modeNum]);
 				d[n] = score;
 			}
-			//if(d[n] == 0 || Score.t_s_dict[d[n]-1]<Score.t_s_dict[score-1])d[n]=score;
+			
 			return;
 		}
 		if(curr == pos)
@@ -694,6 +696,7 @@ public class Five_Game {
 			ret.add(a[opp].get(0));
 			return ret;
 		}
+		boolean win_flag = false;
 		for(int i = 0; i < a[pn].size();i++)
 		{
 			P tmp = a[pn].get(i);
@@ -703,38 +706,125 @@ public class Five_Game {
 				if (st.countTypeInRange(Score.l4) >= 1)
 				{
 					ret.add(tmp);
-					return ret;
+					win_flag = true;
 				}else if(st.countTypeInRange(Score.s4) >= 2 || (st.hasTypeInRange(Score.s4)&&st.hasTypeInRange(Score.l3)))
 				{
 					ret.add(tmp);
-					return ret;
+					win_flag = true;
 				}
 			}
 		}
+		if(win_flag)return ret;
+		if(level == 3){
+			boolean l4_flag = false;
+			boolean s4_l3_flag = false;
+			for(int i = 0; i < a[opp].size();i++)
+			{
+				P tmp = a[opp].get(i);
+				if(tmp.score_type!=null)
+				{
+					Score st = tmp.score_type;
+					if (st.countTypeInRange(Score.l4) >= 1)
+					{
+						ret.add(tmp);
+						l4_flag = true;
+					}else if(st.countTypeInRange(Score.s4) >= 2 || (st.hasTypeInRange(Score.s4)&&st.hasTypeInRange(Score.l3)))
+					{
+						ret.add(tmp);
+						s4_l3_flag = true;
+					}
+				}
+			}
+			if(l4_flag || s4_l3_flag)
+			{
+				for(int i = 0; i < a[pn].size();i++)
+				{
+					P tmp = a[pn].get(i);
+					if(tmp.score_type!=null)
+					{
+						Score st = tmp.score_type;
+						if (st.countTypeInRange(Score.s4) >= 1)
+						{
+							ret.add(tmp);
+						}
+					}
+				}
+				return ret;
+			}
+		}
+		boolean lose_flag = false;
+		if(level < 3){
+			
+			for(int i = 0; i < a[opp].size();i++)
+			{
+				P tmp = a[opp].get(i);
+				if(tmp.score_type!=null)
+				{
+					Score st = tmp.score_type;
+					if (st.countTypeInRange(Score.l4) >= 1)
+					{
+						ret.add(tmp);
+						lose_flag = true;
+					}else if(st.countTypeInRange(Score.s4) >= 2 || (st.hasTypeInRange(Score.s4)&&st.hasTypeInRange(Score.l3)))
+					{
+						ret.add(tmp);
+						lose_flag = true;
+					}
+				}
+			}
+			if(lose_flag)return ret;
+		}
+		for(int i = 0; i < a[pn].size();i++)
+		{
+			P tmp = a[pn].get(i);
+			if(tmp.score_type!=null)
+			{
+				Score st = tmp.score_type;
+				if (st.countTypeInRange(Score.l3) > 1)
+				{
+					ret.add(tmp);
+				}
+			}
+		}
+		
 		for(int i = 0; i < a[opp].size();i++)
 		{
 			P tmp = a[opp].get(i);
 			if(tmp.score_type!=null)
 			{
 				Score st = tmp.score_type;
-				if (st.countTypeInRange(Score.l4) >= 1)
+				if (st.countTypeInRange(Score.l3) > 1)
 				{
 					ret.add(tmp);
-					return ret;
-				}else if(st.countTypeInRange(Score.s4) >= 2 || (st.hasTypeInRange(Score.s4)&&st.hasTypeInRange(Score.l3)))
-				{
-					ret.add(tmp);
-					return ret;
+					lose_flag = true;
 				}
 			}
 		}
-		for(int i =0;i<a[2].size();i++)
-		{
-			if(a[2].get(i).score > 300)
+		if(lose_flag)return ret;
+		if(level == 3){
+			for(int i =0;i<a[2].size();i++)
 			{
-				ret.add(a[2].get(i));
+				if(a[2].get(i).score > 300)
+				{
+					ret.add(a[2].get(i));
+				}
 			}
+		}else{
+			int i =0;
+			while(a[2].size()>0 && i<10)
+			{
+				ret.add(a[2].get(0));
+				a[2].remove(0);
+				i++;
+			}
+			while(a[2].size()>0 && a[2].get(0).score > 1000)
+			{
+				ret.add(a[2].get(0));
+				a[2].remove(0);
+			}
+			
 		}
+		
 		//ret.addAll(a[pn]);
 		//ret.addAll(a[opp]);
 		
@@ -759,6 +849,11 @@ public class Five_Game {
 		while(it.hasNext())
 		{
 			P pm = it.next();
+			if(ret[1] == -1)
+			{
+				ret[1] = pm.x;
+				ret[2] = pm.y;
+			}
 			this.practiseMove(pm.x, pm.y);    //pretending go
 			if(this.checkWin(pm.x, pm.y))
 			{
