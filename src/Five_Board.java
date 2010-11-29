@@ -127,7 +127,12 @@ public class Five_Board extends JPanel implements MouseListener {
 		}
 	}
 	public void paint(Graphics g) {
-		super.paint(g);
+		try{
+			super.paint(g);
+		}catch(Exception e)
+		{
+			
+		}
 		if(!fg.debug)
 		{
 			this.DefaultWidth = 600;

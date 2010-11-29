@@ -865,7 +865,7 @@ public class Five_Game {
 		}
 		if(depth == 6)
 		{
-			while(a[2].size()>0 && a[2].get(0).score > 500)
+			while(a[2].size()>0 && a[2].get(0).score > 1000)
 			{
 				ret.add(a[2].get(0));
 				a[2].remove(0);
