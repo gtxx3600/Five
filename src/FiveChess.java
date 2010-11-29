@@ -11,7 +11,7 @@ public class FiveChess {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		Five_Game fg = new Five_Game();
 		
