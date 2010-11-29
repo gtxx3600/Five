@@ -319,10 +319,12 @@ public class Five_Game {
 		status = new int[21][21];
 		scores = new int [2][row][row];
 		scores_type = new Score[2][row][row];
+		
 		scores[0][10][10] = 100;
 		scores[1][10][10] = 100;
 		scores_type[0][10][10] = new Score(100);
 		scores_type[1][10][10] = new Score(100);
+		
 		started = true;
 		stack.clear();
 		count=0;
@@ -402,19 +404,15 @@ public class Five_Game {
 		int i1=0,i2=0;
 		P tmp;
 		tmp = p.inc();
-		for(;i1<4;i1++)
-		{
-			if(!this.inBoard(tmp)||((status[tmp.x][tmp.y]!=0)&&!(status[tmp.x][tmp.y]==p.color)))
-			{
+		for(;i1<4;i1++){
+			if(!this.inBoard(tmp)||((status[tmp.x][tmp.y]!=0)&&!(status[tmp.x][tmp.y]==p.color))){
 				break;
 			}
 			tmp = tmp.inc();
 		}
 		tmp = p.inc(-1);
-		for(;i2<4;i2++)
-		{
-			if(!this.inBoard(tmp)||((status[tmp.x][tmp.y]!=0)&&!(status[tmp.x][tmp.y]==p.color)))
-			{
+		for(;i2<4;i2++)	{
+			if(!this.inBoard(tmp)||((status[tmp.x][tmp.y]!=0)&&!(status[tmp.x][tmp.y]==p.color))){
 				break;
 			}
 			tmp = tmp.inc(-1);
