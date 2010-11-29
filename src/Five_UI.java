@@ -30,7 +30,7 @@ public class Five_UI extends JFrame{
 		super("Five Chess");
 		//this.setSize(1200,700);
 		fg=f;
-		String options1[] = {"Computer","Human"};
+		String options1[] = {"AI","Human"};
 		String options2[] = {"Esay","Normal","Hard","VeryHard"};
 		String options3[] = {"Normal","Debug"};
 		fb=new Five_Board(f);
@@ -40,7 +40,7 @@ public class Five_UI extends JFrame{
 		
 		fb.setPreferredSize(new Dimension(1200,1200));
 		rightPanel1 = new JPanel();
-		rightPanel2 = new JPanel();
+		//rightPanel2 = new JPanel();
 		
 		CBDebug = new JComboBox(options3);
 		CBDebug.addItemListener(new ItemListener()
@@ -108,13 +108,10 @@ public class Five_UI extends JFrame{
 			}
 		});
 		
-		
-		//BoxLayout vbox1 = new BoxLayout(rightPanel1,BoxLayout.Y_AXIS);
-		//BoxLayout vbox2 = new BoxLayout(rightPanel2,BoxLayout.Y_AXIS);
 		rightPanel1.setLayout(new GridBagLayout());
-		//setSize(600,800);
+		
 		GridBagConstraints con = new GridBagConstraints();
-		con.fill = GridBagConstraints.NONE;
+		con.fill = GridBagConstraints.HORIZONTAL;
 
 		con.anchor = GridBagConstraints.LINE_START;
 		con.gridx=0;

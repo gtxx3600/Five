@@ -712,14 +712,14 @@ public class Five_Game {
 	 * @param pn (PlayerNum)
 	 * @return possible-move list
 	 */ 
-	public Set<P> getPossibleMove(int pn)
+	public ArrayList<P> getPossibleMove(int pn)
 	{
 		int opp = 1 - pn;
 		ArrayList<P> a[] = new ArrayList[3];
 		a[0] = new ArrayList<P>();
 		a[1] = new ArrayList<P>();
 		a[2] = new ArrayList<P>();
-		Set<P> ret = new HashSet<P>();
+		ArrayList<P> ret = new ArrayList<P>();
 		for(int i=0;i<this.row;i++)
 		{
 			for(int j=0;j<this.row;j++)
@@ -873,7 +873,7 @@ public class Five_Game {
 				a[2].remove(0);
 			}
 		}
-		
+		Collections.sort(ret);
 		return ret;
 	}
 	public int[] getMax(int alpha,int beta,int depth)
@@ -885,15 +885,15 @@ public class Five_Game {
 			ret[0] = this.evaluation();
 			return ret;
 		}
-		Set<P> possibleMoves = this.getPossibleMove(0);
+		ArrayList<P> possibleMoves = this.getPossibleMove(0);
 		if(possibleMoves.size() == 0)
 		{
 			return ret;
 		}
-		Iterator<P> it = possibleMoves.iterator();
-		while(it.hasNext())
+		for(int i=0 ;i < possibleMoves.size(); i++)
 		{
-			P pm = it.next();
+
+			P pm = possibleMoves.get(i);
 			if(ret[1] == -1)
 			{
 				ret[1] = pm.x;
@@ -930,15 +930,15 @@ public class Five_Game {
 			ret[0] = this.evaluation();
 			return ret;
 		}
-		Set<P> possibleMoves = this.getPossibleMove(1);
+		ArrayList<P> possibleMoves = this.getPossibleMove(1);
 		if(possibleMoves.size() == 0)
 		{
 			return ret;
 		}
-		Iterator<P> it = possibleMoves.iterator();
-		while(it.hasNext())
+		for(int i=0 ;i < possibleMoves.size(); i++)
 		{
-			P pm = it.next();
+
+			P pm = possibleMoves.get(i);
 			this.practiseMove(pm.x, pm.y);    //pretending go
 			if(this.checkWin(pm.x, pm.y))
 			{
